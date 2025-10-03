@@ -1,8 +1,8 @@
 package com.nova.team.utp_connect_backend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nova.team.utp_connect_backend.enities.User;
-import com.nova.team.utp_connect_backend.services.UserService;
+import com.nova.team.utp_connect_backend.enities.Post;
+import com.nova.team.utp_connect_backend.services.PostService;
 import com.nova.team.utp_connect_backend.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,42 +14,43 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/posts")
+public class PostController {
 
     @Autowired
-    private UserService userService;
+    private PostService postService;
 
     @PostMapping
     public ResponseEntity<?> create(
-            @RequestPart("user") String userJson,
-            @RequestPart(value = "image", required = false) MultipartFile image
+            @RequestPart("post") String postJson,
+            @RequestPart(value = "mediaFiles", required = false) List<MultipartFile> mediaFiles
     ) throws IOException {
         ObjectMapper om = new ObjectMapper();
-        User user = om.readValue(userJson, User.class);
+        Post post = om.readValue(postJson, Post.class);
 
         try {
-            User createdUser = userService.create(user, image);
+            Post createdPost = postService.create(post, mediaFiles);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ResponseUtil.successResponse("Usuario creado exitosamente", createdUser));
+                    .body(ResponseUtil.successResponse("Post creado exitosamente", createdPost));
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ResponseUtil.errorResponse(ex.getMessage()));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseUtil.errorResponse("Error al crear el usuario"));
+                    .body(ResponseUtil.errorResponse("Error al crear el post"));
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
-            Optional<User> user = userService.findById(id);
-            return ResponseEntity.ok(ResponseUtil.successResponse("Usuario encontrado", user));
+            Optional<Post> post = postService.findById(id);
+            return ResponseEntity.ok(ResponseUtil.successResponse("Post encontrado", post));
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.errorResponse(ex.getMessage()));
         }
@@ -58,33 +59,42 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAll(@PageableDefault(size = 10, page = 0) Pageable pageable) {
         try {
-            Page<User> users = userService.findAll(pageable);
-            return ResponseEntity.ok(ResponseUtil.successResponse("Usuarios encontrados exitosamente", users));
+            Page<Post> posts = postService.findAll(pageable);
+            return ResponseEntity.ok(ResponseUtil.successResponse("Posts encontrados exitosamente", posts));
         } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.errorResponse("Error al buscar los usuarios"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.errorResponse("Error al buscar los posts"));
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable("id") UUID id,
-            @RequestPart("user") String userJson,
-            @RequestPart(value = "image", required = false) MultipartFile image
+            @RequestPart("post") String postJson,
+            @RequestPart(value = "mediaFiles", required = false) List<MultipartFile> mediaFiles
     ) throws IOException {
         ObjectMapper om = new ObjectMapper();
-        User user = om.readValue(userJson, User.class);
+        Post post = om.readValue(postJson, Post.class);
 
         try {
-            User updatedUser = userService.update(id, user, image);
+            Post updatedPost = postService.update(id, post, mediaFiles);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(ResponseUtil.successResponse("Usuario actualizado exitosamente", updatedUser));
+                    .body(ResponseUtil.successResponse("Post actualizado exitosamente", updatedPost));
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ResponseUtil.errorResponse(ex.getMessage()));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseUtil.errorResponse("Error al actualizar el usuario"));
+                    .body(ResponseUtil.errorResponse("Error al actualizar el post"));
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
+        try {
+            postService.delete(id);
+            return ResponseEntity.ok(ResponseUtil.successResponse("Post eliminado exitosamente", null));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.errorResponse(ex.getMessage()));
+        }
+    }
 }

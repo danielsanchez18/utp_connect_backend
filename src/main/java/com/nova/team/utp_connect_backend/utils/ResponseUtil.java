@@ -1,4 +1,4 @@
-package com.nova.team.utp_connect_backend.validations;
+package com.nova.team.utp_connect_backend.utils;
 
 import java.util.HashMap;
 import java.util.Map;

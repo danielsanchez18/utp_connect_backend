@@ -8,6 +8,7 @@ import com.nova.team.utp_connect_backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public User create(User user, MultipartFile image) {
 
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService {
         studentRole.setId(1L);
         studentRole.setName("Estudiante");
         user.setRoles(List.of(studentRole));
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encriptar la contraseña
 
         // Si la imagen no está vacía, almacenamos la imagen
         if (image != null && !image.isEmpty()) {
