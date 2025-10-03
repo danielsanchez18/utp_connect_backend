@@ -21,13 +21,13 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String faculty;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int cycle;
 
-    @Column(nullable = false, unique = true)
+    //@Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false, unique = true)

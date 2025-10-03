@@ -1,5 +1,6 @@
 package com.nova.team.utp_connect_backend.servicesImpl;
 
+import com.nova.team.utp_connect_backend.enities.Role;
 import com.nova.team.utp_connect_backend.enities.User;
 import com.nova.team.utp_connect_backend.repositories.UserRepository;
 import com.nova.team.utp_connect_backend.services.FileStorageService;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +26,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user, MultipartFile image) {
+
+        // Asignar el rol "Estudiante" manualmente
+        Role studentRole = new Role();
+        studentRole.setId(1L);
+        studentRole.setName("Estudiante");
+        user.setRoles(List.of(studentRole));
 
         // Si la imagen no está vacía, almacenamos la imagen
         if (image != null && !image.isEmpty()) {
